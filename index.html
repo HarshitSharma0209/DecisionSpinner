@@ -1,0 +1,554 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c1: #FF6B6B; --c2: #FFE66D; --c3: #4ECDC4; --c4: #A78BFA;
+    --c5: #FB923C; --c6: #34D399; --c7: #F472B6; --c8: #60A5FA;
+    --bg: #0f0e17; --surface: #1a1929; --card: #221f35;
+    --text: #fffffe; --muted: #a7a9be;
+    --accent: #FFE66D;
+  }
+
+  body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); }
+
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 3rem;
+    background: radial-gradient(ellipse at 20% 10%, rgba(255,107,107,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 90%, rgba(167,139,250,0.12) 0%, transparent 50%),
+                var(--bg);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, #FF6B6B, #FFE66D, #4ECDC4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2.5rem;
+    width: 100%;
+    max-width: 900px;
+    align-items: start;
+  }
+
+  .left-panel { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .option-input {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .option-input:focus {
+    border-color: rgba(255,230,109,0.4);
+    box-shadow: 0 0 0 3px rgba(255,230,109,0.08);
+  }
+
+  .option-input::placeholder { color: rgba(167,169,190,0.4); }
+
+  .add-btn {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: var(--accent);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    width: 48px; flex-shrink: 0;
+  }
+
+  .add-btn:hover { background: rgba(255,230,109,0.1); transform: scale(1.05); }
+  .add-btn:active { transform: scale(0.96); }
+
+  .chips-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: 44px;
+  }
+
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: default;
+    transition: transform 0.15s;
+    animation: chipIn 0.25s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .chip-x {
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.6;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    transition: opacity 0.15s;
+  }
+
+  .chip-x:hover { opacity: 1; }
+
+  .empty-hint {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 0.25rem 0;
+  }
+
+  .spin-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #FF6B6B, #A78BFA);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(255,107,107,0.3);
+  }
+
+  .spin-btn:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(255,107,107,0.4);
+  }
+
+  .spin-btn:active:not(:disabled) { transform: translateY(0); }
+  .spin-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .result-box {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 1.25rem;
+    text-align: center;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    transition: border-color 0.3s;
+  }
+
+  .result-box.has-result {
+    border-color: rgba(255,230,109,0.25);
+    box-shadow: 0 0 30px rgba(255,230,109,0.05);
+  }
+
+  .result-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .result-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .result-empty { color: var(--muted); font-size: 0.9rem; font-style: italic; }
+
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: sticky;
+    top: 1rem;
+  }
+
+  .wheel-wrap {
+    position: relative;
+    width: 340px;
+    height: 340px;
+  }
+
+  .wheel-canvas { border-radius: 50%; display: block; }
+
+  .center-hub {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px; height: 48px;
+    background: var(--bg);
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.15);
+    box-shadow: 0 0 0 6px rgba(0,0,0,0.4);
+    z-index: 3;
+  }
+
+  .pointer {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  }
+
+  .confetti-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .right-panel { position: static; }
+    .wheel-wrap { width: 280px; height: 280px; }
+  }
+</style>
+
+<div class="app">
+  <h1>Decision Spinner</h1>
+  <p class="subtitle">Add your options, give it a spin — let fate decide!</p>
+
+  <div class="layout">
+    <div class="left-panel">
+      <div>
+        <div class="section-label">Add Options</div>
+        <div class="input-row">
+          <input class="option-input" id="optInput" type="text" placeholder="Type an option..." maxlength="30" />
+          <button class="add-btn" id="addBtn" title="Add">+</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Your Options <span id="countBadge" style="opacity:0.5"></span></div>
+        <div class="chips-area" id="chips">
+          <span class="empty-hint">Add at least 2 options to spin!</span>
+        </div>
+      </div>
+
+      <div>
+        <button class="spin-btn" id="spinBtn" disabled>Spin the Wheel</button>
+      </div>
+
+      <div class="result-box" id="resultBox">
+        <span class="result-empty">Your destiny awaits...</span>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="wheel-wrap" id="wheelWrap">
+        <canvas class="wheel-canvas" id="wheelCanvas" width="340" height="340"></canvas>
+        <div class="center-hub"></div>
+        <svg class="pointer" width="30" height="36" viewBox="0 0 30 36">
+          <polygon points="15,2 28,34 15,26 2,34" fill="#FFE66D" stroke="#0f0e17" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <canvas class="confetti-layer" id="confettiCanvas"></canvas>
+</div>
+
+<script>
+const COLORS = ['#FF6B6B','#FFE66D','#4ECDC4','#A78BFA','#FB923C','#34D399','#F472B6','#60A5FA','#FF9A9E','#C3F584'];
+const DARK = ['rgba(0,0,0,0.28)','rgba(0,0,0,0.2)'];
+
+let options = [];
+let spinning = false;
+let currentAngle = 0;
+
+const canvas = document.getElementById('wheelCanvas');
+const ctx = canvas.getContext('2d');
+const spinBtn = document.getElementById('spinBtn');
+const addBtn = document.getElementById('addBtn');
+const optInput = document.getElementById('optInput');
+const chipsEl = document.getElementById('chips');
+const resultBox = document.getElementById('resultBox');
+const countBadge = document.getElementById('countBadge');
+
+function getColor(i) { return COLORS[i % COLORS.length]; }
+
+function drawWheel(angle) {
+  const W = canvas.width, cx = W/2, cy = W/2, r = W/2 - 6;
+  ctx.clearRect(0, 0, W, W);
+
+  if (options.length === 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.fillStyle = '#221f35';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(167,169,190,0.35)';
+    ctx.font = '500 15px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Add options to begin', cx, cy);
+    return;
+  }
+
+  const n = options.length;
+  const slice = (Math.PI * 2) / n;
+
+  for (let i = 0; i < n; i++) {
+    const start = angle + i * slice;
+    const end = start + slice;
+    const color = getColor(i);
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.strokeStyle = '#0f0e17';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(start + slice / 2);
+    const textR = r * 0.62;
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.font = `600 ${n > 6 ? 12 : 14}px DM Sans`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const label = options[i].length > 14 ? options[i].slice(0,13)+'…' : options[i];
+    ctx.fillText(label, textR, 0);
+    ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = 0.92;
+    ctx.fillText(label, textR, 0);
+    ctx.restore();
+  }
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+function renderChips() {
+  if (options.length === 0) {
+    chipsEl.innerHTML = '<span class="empty-hint">Add at least 2 options to spin!</span>';
+    countBadge.textContent = '';
+  } else {
+    countBadge.textContent = `(${options.length})`;
+    chipsEl.innerHTML = options.map((o, i) => {
+      const color = getColor(i);
+      return `<span class="chip" style="background:${color}22;color:${color};border:1px solid ${color}44">
+        ${o}
+        <button class="chip-x" onclick="removeOption(${i})">×</button>
+      </span>`;
+    }).join('');
+  }
+  spinBtn.disabled = options.length < 2;
+  drawWheel(currentAngle);
+}
+
+function addOption() {
+  const val = optInput.value.trim();
+  if (!val) return;
+  if (options.includes(val)) { optInput.select(); return; }
+  options.push(val);
+  optInput.value = '';
+  renderChips();
+}
+
+function removeOption(i) {
+  options.splice(i, 1);
+  renderChips();
+}
+
+function getWinner(finalAngle) {
+  const n = options.length;
+  const slice = (Math.PI * 2) / n;
+  const pointer = -Math.PI / 2;
+  let a = ((pointer - finalAngle) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+  const idx = Math.floor(a / slice) % n;
+  return options[idx];
+}
+
+function showResult(winner, winnerIdx) {
+  const color = getColor(winnerIdx);
+  resultBox.className = 'result-box has-result';
+  resultBox.innerHTML = `
+    <div class="result-label">The Wheel Has Spoken</div>
+    <div class="result-value" style="color:${color}">${winner}</div>
+  `;
+  launchConfetti(color);
+}
+
+function spinWheel() {
+  if (spinning || options.length < 2) return;
+  spinning = true;
+  spinBtn.disabled = true;
+  resultBox.className = 'result-box';
+  resultBox.innerHTML = '<span class="result-empty">Spinning...</span>';
+
+  const extraSpins = (5 + Math.floor(Math.random() * 5)) * Math.PI * 2;
+  const targetDelta = extraSpins + Math.random() * Math.PI * 2;
+  const duration = 4000 + Math.random() * 1500;
+  const startAngle = currentAngle;
+  const startTime = performance.now();
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+  function frame(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    currentAngle = startAngle + targetDelta * easeOut(progress);
+    drawWheel(currentAngle);
+
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      currentAngle = startAngle + targetDelta;
+      drawWheel(currentAngle);
+      spinning = false;
+      spinBtn.disabled = options.length < 2;
+      const winner = getWinner(currentAngle);
+      const idx = options.indexOf(winner);
+      setTimeout(() => showResult(winner, idx), 200);
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+const confettiCanvas = document.getElementById('confettiCanvas');
+const cctx = confettiCanvas.getContext('2d');
+let confettiParts = [];
+
+function launchConfetti(mainColor) {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  confettiParts = [];
+  const colors = [mainColor, '#FFE66D', '#4ECDC4', '#FF6B6B', '#A78BFA', '#ffffff'];
+  for (let i = 0; i < 120; i++) {
+    confettiParts.push({
+      x: Math.random() * confettiCanvas.width,
+      y: -10 - Math.random() * 200,
+      vx: (Math.random() - 0.5) * 6,
+      vy: 2 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      r: 4 + Math.random() * 6,
+      rot: Math.random() * Math.PI * 2,
+      rv: (Math.random() - 0.5) * 0.2,
+      shape: Math.random() > 0.5 ? 'rect' : 'circle',
+      alpha: 1
+    });
+  }
+  animateConfetti();
+}
+
+function animateConfetti() {
+  if (!confettiParts.length) return;
+  cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiParts.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.1;
+    p.rot += p.rv;
+    if (p.y > confettiCanvas.height * 0.7) p.alpha -= 0.025;
+    cctx.save();
+    cctx.globalAlpha = Math.max(0, p.alpha);
+    cctx.translate(p.x, p.y);
+    cctx.rotate(p.rot);
+    cctx.fillStyle = p.color;
+    if (p.shape === 'rect') {
+      cctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
+    } else {
+      cctx.beginPath();
+      cctx.arc(0, 0, p.r/2, 0, Math.PI*2);
+      cctx.fill();
+    }
+    cctx.restore();
+  });
+  confettiParts = confettiParts.filter(p => p.alpha > 0);
+  if (confettiParts.length) requestAnimationFrame(animateConfetti);
+  else cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+}
+
+addBtn.addEventListener('click', addOption);
+optInput.addEventListener('keydown', e => { if (e.key === 'Enter') addOption(); });
+spinBtn.addEventListener('click', spinWheel);
+
+['Dinner out', 'Cook at home', 'Order pizza', 'Sushi night'].forEach(o => options.push(o));
+renderChips();
+</script>
